@@ -1,0 +1,154 @@
+<html>
+<head>
+<script type="text/javascript" src="/static/jquery.min.js"></script>
+<!-- TEST -->
+<script type="text/javascript" src="/static/jcanvas.min.js"></script>
+<script type="text/javascript" src="/static/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/static/jquery.simple-color.js"></script>
+<script type="text/javascript" src="/static/canvas.js"></script>
+<script type="text/javascript" src="/static/interactive.js"></script>
+<link rel="stylesheet" href="/static/jquery-ui.css"></link>
+<link rel="stylesheet" href="/static/main.css"></link>
+<script type="text/javascript" src="/static/now.js"></script>
+<title>CollabBoard</title>
+</head>
+<body>
+<script type="text/javascript">
+function initUI() {
+    $("#slider").slider({
+        min: 1,
+        max: 30,
+        value: 5,
+        slide: function(event, ui) { window.settings.penWidth = ui.value; }
+      });
+  $("#color-picker").simpleColor({
+      defaultColor: "#FFF",
+      cellWidth: 12,
+      cellHeight: 12,
+      border: "0px",
+      cellMargin: 0,
+      boxWidth: "96px",
+      boxHeight: "5px",
+      columns: 8,
+      border: '1px solid #333333',
+      buttonClass: 'button'
+    });
+
+  // Make canvas fit div at startup
+  canvas_resize();
+  $(window).resize(canvas_resize);
+  $(window).resize(resizeCursorCanvas);
+
+  window.started = false;
+  window.pen_x = 0, window.pen_y = 0;
+  window.grid = false;
+}
+
+window.attachPenHandlers = function() {
+  $("#cursorcanvas").mousemove(penMoveHandler);
+  $("#cursorcanvas").mousedown(penDownHandler);
+  $("#cursorcanvas").mouseup(penUpHandler);
+  $("#cursorcanvas").mouseout(penUpHandler);
+  $("#undo-button").click(function(event) { canvas_saves.pop(); canvas_undo(); now.undo_server(canvas_saves[canvas_saves.length-1]); });
+  $("#undo-button").show();
+  $("#clear-button").click(function(event) { now.clear_server(); });
+  $("#clear-button").show();
+  $("#erase-button").click(function(event) { 
+    settings.erase = !settings.erase; 
+    if(settings.erase) $("#erase-button").attr("src", "/static/images/draw-eraser-down.png");
+    else $("#erase-button").attr("src", "/static/images/draw-eraser.png");
+  });
+  $("#erase-button").show();
+  $("#line-button").click(function(event) { 
+    settings.line = !settings.line; 
+  });
+  $("#line-button").show();
+  $("#session_button").click(function(event) {
+    var session_name = prompt("Enter the name of your session", "elephant");
+    now.change_session(session_name);
+    window.history.replaceState("", "", "/session/" + session_name);
+  });
+  /*$("#background_button").change(function(e) {
+     for (var i = 0; i < e.originalEvent.srcElement.files.length; i++) {
+        var file = e.originalEvent.srcElement.files[i];
+        var img = document.createElement("img");
+        var reader = new FileReader();
+        reader.onloadend = function() {
+             $("#drawing-area").css("background-image", "url(" + reader.result + ")")
+                               .css("background-repeat", "no-repeat");
+        }
+        reader.readAsDataURL(file);
+        $("input").after(img);
+    }
+  });*/
+  function setBackground(i) {
+    var filename = "/static/images/KS2paper-" + i + ".png"
+     $("#drawing-area").css("background-image", "url(" + filename + ")")
+                       .css("background-repeat", "no-repeat");
+  }
+  settings.background_index = 0
+  setBackground(settings.background_index);
+  $('#bg_prev').click(function() {
+    settings.background_index = Math.max(0, settings.background_index-1)
+    setBackground(settings.background_index);
+  })
+  $('#bg_next').click(function() {
+    settings.background_index = Math.min(23, settings.background_index+1)
+    setBackground(settings.background_index);
+  })
+}
+$(document).ready(function() {
+  initUI();
+  now.ready(initNow);
+});
+</script>
+<div id="container">
+  <div id="sidebar">
+    <div id="brush-small"></div><div id="brush-large"></div>
+    <div style="clear: both;"></div>
+    <div id="slider"></div>
+    <input id='color-picker' type="hidden"/>
+    <div id="toolset">
+      <input id="clear-button" hidden="hidden" type="image" src="/static/images/new.png"></input>
+      <input id="undo-button" hidden="hidden" type="image" src="/static/images/undo.png"></input>
+      <input id="erase-button" hidden="hidden"  type="image" src="/static/images/draw-eraser.png"></input>
+      <input id="line-button" hidden="hidden"  type="image" src="/static/images/line-tool.png"></input>
+    </div>
+    <div>
+	<input type="button" id="session_button" value="Create Session"></input><div style="clear:both;"></div>
+  <input type="button" id="bg_prev" value="Prev BG"></input>
+  <input type="button" id="bg_next" value="Next BG"></input>
+    </div>
+    <div id="wacom"><a href="http://www.wacom.com/CustomerCare/Plugin.aspx" target="_blank"><img src="/static/images/wacom.png"></img></a></div>
+  </div>
+  <div id="drawing-area">
+    <div id="canvas-div">
+    <canvas id="canvas" width="600" height="600" style="cursor:crosshair;-webkit-user-select: none;">
+      <p>Unfortunately, your browser is currently unsupported by our web 
+      application.  We are sorry for the inconvenience. Please use one of the 
+      supported browsers listed below, or draw the image you want using an 
+      offline tool.</p>
+      <p>Supported browsers: <a href="https://www.google.com/chrome/">Chrome</a>, 
+      <a href="http://www.mozilla.com">Firefox</a>, 
+      <a href="http://www.apple.com/safari">Safari</a>
+    </canvas>
+    </div>
+    <div id="linecanvas-div">
+    <canvas id="linecanvas" width="600" height="600" style="-webkit-user-select: none;">lol</canvas>
+    </div>
+    <div id="cursorcanvas-div">
+    <canvas id="cursorcanvas" width="600" height="600" style="-webkit-user-select: none;">lol</canvas>
+    </div>
+  </div>   
+  <div class="clear"></div>
+</div>
+<!--[if !IE]> <-->
+    <!-- This is the Firebreath wacomtabletplugin -->
+    <object id="wtPlugin" type="application/x-wacomtabletplugin" width="300" height="300">
+          <!-- <param name="onload" value="pluginLoaded" /> -->
+    </object>
+<!--> <![endif]-->
+
+</body>
+
+</html>

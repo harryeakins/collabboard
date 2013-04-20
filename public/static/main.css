@@ -1,0 +1,90 @@
+html, body {
+   height: 100%;
+}
+body {
+   margin: 0;
+   padding: 0;
+   border: 0;
+   background-color: #111;
+}
+#container {
+   position: relative;
+   width: 100%;
+   height: 100%;
+   background-color: #111;
+}
+#sidebar, #drawing-area {
+   position: absolute;
+   color: #000;
+}
+#sidebar {
+   left: 13px;
+   bottom: 13px;
+   top: 13px;
+   width: 135px;
+   padding: 13px;
+   background-color: #222;
+}
+
+#drawing-area{
+   right: 13px;
+   bottom: 13px;
+   top: 13px;
+   left: 187px;
+   padding: 0;
+   background-color: #000;
+   background-repeat: no-repeat; 
+   border-left: #FFF;
+   cursor: pointer;
+}
+.clear {
+   height: 0;
+   font-size: 1px;
+   margin: 0;
+   padding: 0;
+   line-height: 0;
+   clear: both;
+}
+.simpleColorContainer {
+  margin-top: 10px;
+}
+
+#wacom {
+	position: absolute;
+	bottom: 10px;
+}
+
+#canvas-div, #cursorcanvas-div, #linecanvas-div {
+  position: absolute;
+  top: 0;
+  left:0;
+}
+#canvas-div {
+  z-index: 0;
+}
+#linecanvas-div {
+  z-index: 1;
+}
+#cursorcanvas-div {
+  z-index: 2;
+}
+
+#toolset {
+  margin-top: 10px;
+}
+
+#brush-small, #brush-large {
+  width: 22px;
+  height: 22px;
+  margin-bottom: 5px;
+}
+
+#brush-small {
+  float: left;
+  background-image: url("/static/images/brush-small.png")
+}
+
+#brush-large {
+  float: right;
+  background-image: url("/static/images/brush-large.png")
+}

@@ -1,0 +1,21 @@
+== Sessions ==
+Sessions are to be created using the url ( e.g. harryeakins.com:8888/session/elephant )
+Sessions are public and require no password
+Sessions are identified with a string
+
+Commands:
+- Join session - doesn't copy anything
+- Sessions are permanent - must manually wipe page
+
+== Infinitely large canvas ==
+- Zoom in and out
+- Pan
+-- Vector information kept only to recreate the image
+-- Image rerendered only on resize or panning to previously unseen area of screen
+-- Zoomed image shown until rerendering complete
+
+== Touch Screen Compatible ==
+- Multitouch
+
+== Simplify ==
+- No undoing allowed - just use pen to undo
